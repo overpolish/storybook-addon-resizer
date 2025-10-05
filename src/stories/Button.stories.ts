@@ -38,6 +38,9 @@ export const Primary: Story = {
 };
 
 export const Secondary: Story = {
+  parameters: {
+    layout: "centered",
+  },
   args: {
     label: "Button",
   },
