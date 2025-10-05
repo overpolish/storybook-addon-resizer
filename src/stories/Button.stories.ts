@@ -47,6 +47,7 @@ export const Secondary: Story = {
 };
 
 export const Large: Story = {
+  globals: { resizer: { width: 403 } },
   args: {
     size: "large",
     label: "Button",

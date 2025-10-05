@@ -5,9 +5,9 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useChannel, type API } from "storybook/manager-api";
+import { useChannel, useGlobals, type API } from "storybook/manager-api";
 import { Button, IconButton, WithTooltip } from "storybook/internal/components";
-import { TOOL_ID } from "../constants";
+import { KEY, TOOL_ID } from "../constants";
 import { TransferIcon } from "@storybook/icons";
 import { Slider } from "./Slider";
 import { STORY_CHANGED } from "storybook/internal/core-events";
@@ -52,6 +52,7 @@ const generateOverflowVisual = (color: string): HTMLDivElement => {
 
 export const Tool = memo(function Tool({ api }: { api: API }) {
   const theme = useTheme();
+  const [_globals, _updateGlobals, storyGlobals] = useGlobals();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -64,31 +65,31 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const updateWidthLimits = () => {
-    if (iframeRef.current) {
-      const padded =
-        iframeRef.current.contentDocument?.body.classList.contains(
-          PADDED_CLASS,
-        );
+    if (!iframeRef.current) return;
 
-      const iframeWidth =
-        iframeRef.current.clientWidth - (padded ? PADDING * 2 : 0);
+    setIsDisabled(
+      iframeRef.current.contentDocument?.body.classList.contains(
+        CENTERED_LAYOUT_CLASS,
+      ) ?? false,
+    );
 
-      setPadding(padded ? PADDING : 0);
+    const padded =
+      iframeRef.current.contentDocument?.body.classList.contains(PADDED_CLASS);
 
-      setWidth((prevWidth) =>
-        iframeWidth < prevWidth || prevWidth === maxWidthRef.current
-          ? iframeWidth
-          : prevWidth,
-      );
+    const iframeWidth =
+      iframeRef.current.clientWidth - (padded ? PADDING * 2 : 0);
 
-      setMaxWidth(iframeWidth);
+    setPadding(padded ? PADDING : 0);
 
-      setIsDisabled(
-        iframeRef.current.contentDocument?.body.classList.contains(
-          CENTERED_LAYOUT_CLASS,
-        ) ?? false,
-      );
-    }
+    setMaxWidth(iframeWidth);
+
+    if (KEY in storyGlobals) return;
+
+    setWidth((prevWidth) =>
+      iframeWidth < prevWidth || prevWidth === maxWidthRef.current
+        ? iframeWidth
+        : prevWidth,
+    );
   };
 
   useChannel(
@@ -100,7 +101,7 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
         updateWidthLimits();
       },
     },
-    [width, maxWidth, padding, isDisabled],
+    [width, maxWidth, padding, isDisabled, storyGlobals],
   );
 
   useLayoutEffect(() => {
@@ -138,16 +139,18 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
 
     if (!storybookRoot || !overflowVisualRef.current) return;
 
+    const w = (storyGlobals[KEY]?.width as number | undefined) ?? width;
+
     storybookRoot.style.width =
-      width === maxWidth || isDisabled ? "unset" : `${width}px`;
+      w === maxWidth || isDisabled ? "unset" : `${w}px`;
 
     overflowVisualRef.current.style.opacity =
-      isDisabled || width === maxWidth ? "0" : "1";
-    overflowVisualRef.current.style.left = `${width + padding}px`;
-    overflowVisualRef.current.style.width = `${maxWidth - width + padding}px`;
+      isDisabled || w === maxWidth ? "0" : "1";
+    overflowVisualRef.current.style.left = `${w + padding}px`;
+    overflowVisualRef.current.style.width = `${maxWidth - w + padding}px`;
 
-    overflowVisualRef.current.innerHTML = `<span style="padding: 4px;">${width}px</span>`;
-  }, [width, maxWidth, padding, isDisabled]);
+    overflowVisualRef.current.innerHTML = `<span style="padding: 4px;">${w}px</span>`;
+  }, [width, maxWidth, padding, isDisabled, storyGlobals]);
 
   return (
     <WithTooltip
@@ -164,9 +167,10 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
             label="Width"
             name="width"
             unit="px"
-            onChange={(value) =>
-              setWidth(Array.isArray(value) ? (value[0] ?? maxWidth) : value)
-            }
+            onChange={(value) => {
+              if (KEY in storyGlobals) return;
+              setWidth(Array.isArray(value) ? (value[0] ?? maxWidth) : value);
+            }}
             onReset={() => setWidth(maxWidth)}
           />
 
@@ -195,9 +199,11 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
         key={TOOL_ID}
         active={width !== maxWidth && !isDisabled}
         onClick={() => setIsOpen((prev) => !prev)}
-        disabled={iframeRef.current?.contentDocument?.body.classList.contains(
-          CENTERED_LAYOUT_CLASS,
-        )}
+        disabled={
+          iframeRef.current?.contentDocument?.body.classList.contains(
+            CENTERED_LAYOUT_CLASS,
+          ) || KEY in storyGlobals
+        }
       >
         <TransferIcon />
       </IconButton>
