@@ -1,4 +1,3 @@
-import { useEffect, useGlobals } from "storybook/preview-api";
 import type {
   Renderer,
   StoryContext,
@@ -7,9 +6,7 @@ import type {
 
 export const withGlobals = (
   StoryFn: StoryFunction<Renderer>,
-  context: StoryContext<Renderer>,
+  _context: StoryContext<Renderer>,
 ) => {
-  const [globals] = useGlobals();
-
   return StoryFn();
 };

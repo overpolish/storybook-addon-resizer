@@ -21,7 +21,7 @@ import { withGlobals } from "./withGlobals";
 const preview: ProjectAnnotations<Renderer> = {
   decorators: [withGlobals],
   initialGlobals: {
-    [KEY]: false,
+    [KEY]: { width: undefined },
   },
 };
 
