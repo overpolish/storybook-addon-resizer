@@ -8,6 +8,7 @@ const meta: Meta<typeof Header> = {
     // More on Story layout: https://storybook.js.org/docs/react/configure/story-layout
     layout: "fullscreen",
   },
+  globals: { resizer: { width: 403 } },
 };
 
 export default meta;
