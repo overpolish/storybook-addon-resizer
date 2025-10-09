@@ -11,13 +11,14 @@ import type {
   PartialStoryFn as StoryFunction,
 } from "storybook/internal/types";
 import { EVENTS, KEY } from "./constants";
-import { css, type Theme } from "storybook/internal/theming";
+import { css } from "storybook/internal/theming";
 
 const RESIZER_STYLE_ID = "resizer-overflow-visual";
-const RESIZER_COLOR_VAR = "--resizer-color";
 const RESIZER_CONTENT_VAR = "--resizer-content";
 const RESIZER_LEFT_OFFSET_VAR = "--left-offset";
 const RESIZER_OVERFLOW_VISUAL_VISIBILITY_VAR = "--overflow-visual-visibility";
+
+const RESIZER_COLOR = "#FF4400"; // Storybook theme.color.negative
 
 const addOverflowVisualStyles = () => {
   const existingStyle = global.document.getElementById(RESIZER_STYLE_ID);
@@ -27,13 +28,13 @@ const addOverflowVisualStyles = () => {
   const style = global.document.createElement("style");
   style.setAttribute("id", RESIZER_STYLE_ID);
 
-  const translucentColor = `rgb(from var(${RESIZER_COLOR_VAR}) r g b / 0.05)`;
+  const translucentColor = `rgb(from ${RESIZER_COLOR} r g b / 0.05)`;
   style.innerHTML = css({
     "body::before": {
       fontFamily: "sans-serif",
       fontSize: "12px",
       fontWeight: "bold",
-      color: `var(${RESIZER_COLOR_VAR})`,
+      color: `${RESIZER_COLOR}`,
       padding: "4px 8px",
 
       content: `var(${RESIZER_CONTENT_VAR})`,
@@ -53,7 +54,7 @@ const addOverflowVisualStyles = () => {
       zIndex: -1,
       visibility:
         `var(${RESIZER_OVERFLOW_VISUAL_VISIBILITY_VAR}, hidden)` as any,
-      boxShadow: `inset 2px 0px 0px 0px var(${RESIZER_COLOR_VAR})`,
+      boxShadow: `inset 2px 0px 0px 0px ${RESIZER_COLOR}`,
     },
   }).styles;
 
@@ -77,9 +78,6 @@ export const withGlobals = (
   const isCentered = layout === "centered";
   const isInDocs = context.viewMode === "docs";
 
-  // Storybook theme from channel
-  const [theme, setTheme] = useState<Theme | undefined>(undefined);
-
   const [width, setWidth] = useState(
     isCentered || !globals[KEY].width || isInDocs
       ? document.documentElement.clientWidth // Full width for centered stories
@@ -95,7 +93,6 @@ export const withGlobals = (
       if (isCentered || isInDocs) return;
       setWidth(width);
     },
-    [EVENTS.STORYBOOK_THEME]: setTheme,
   });
 
   const emitMaxWidth = () => {
@@ -112,13 +109,6 @@ export const withGlobals = (
       removeOverflowVisualStyles();
     };
   }, []);
-
-  useEffect(() => {
-    document.body.style.setProperty(
-      RESIZER_COLOR_VAR,
-      theme?.color.negative ?? "red",
-    );
-  }, [theme]);
 
   useEffect(() => {
     emitMaxWidth();

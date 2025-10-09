@@ -9,7 +9,7 @@ import { Button, IconButton, WithTooltip } from "storybook/internal/components";
 import { EVENTS, KEY, TOOL_ID } from "../constants";
 import { TransferIcon } from "@storybook/icons";
 import { Slider } from "./Slider";
-import { styled, useTheme } from "storybook/internal/theming";
+import { styled } from "storybook/internal/theming";
 import { MINIMAL_VIEWPORTS } from "storybook/internal/viewport";
 
 const Tooltip = styled.div`
@@ -21,7 +21,6 @@ const Tooltip = styled.div`
 `;
 
 export const Tool = memo(function Tool({ api }: { api: API }) {
-  const theme = useTheme();
   const [globals, updateGlobals, storyGlobals] = useGlobals();
   const layout = useParameter<"centered" | "fullscreen" | undefined>("layout");
 
@@ -68,16 +67,12 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
   };
 
   useEffect(() => {
-    emit(EVENTS.STORYBOOK_THEME, theme);
-  }, [theme]);
-
-  useEffect(() => {
     if (maxWidth !== -1 && width === -1) {
       updateWidth(storyGlobals[KEY]?.width ?? globals[KEY]?.width ?? maxWidth);
     } else if (!isActive) {
       updateWidth(maxWidth);
     }
-  }, [maxWidth, isActive]);
+  }, [maxWidth, isActive, globals[KEY]?.width]);
 
   return (
     <WithTooltip
