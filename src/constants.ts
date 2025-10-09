@@ -5,5 +5,5 @@ export const KEY = `resizer`;
 export const EVENTS = {
   MAX_WIDTH_CHANGED: `${ADDON_ID}/maxWidthChanged`,
   WIDTH_CHANGE: `${ADDON_ID}/widthChange`,
-  STORYBOOK_THEME: `${ADDON_ID}/storybookTheme`,
+  STORYBOOK_COLOR_NEGATIVE: `${ADDON_ID}/storybookColorNegative`,
 };
