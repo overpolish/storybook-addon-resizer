@@ -9,8 +9,12 @@ import { Button, IconButton, WithTooltip } from "storybook/internal/components";
 import { EVENTS, KEY, TOOL_ID } from "../constants";
 import { TransferIcon } from "@storybook/icons";
 import { Slider } from "./Slider";
-import { styled } from "storybook/internal/theming";
-import { MINIMAL_VIEWPORTS } from "storybook/internal/viewport";
+import { styled, useTheme } from "storybook/internal/theming";
+import {
+  MINIMAL_VIEWPORTS,
+  type ViewportMap,
+} from "storybook/internal/viewport";
+import { STORY_RENDERED } from "storybook/internal/core-events";
 
 const Tooltip = styled.div`
   padding: 8px;
@@ -21,27 +25,41 @@ const Tooltip = styled.div`
 `;
 
 export const Tool = memo(function Tool({ api }: { api: API }) {
+  const theme = useTheme();
   const [globals, updateGlobals, storyGlobals] = useGlobals();
+
+  const viewports =
+    useParameter<{ options?: ViewportMap }>("viewport", {}).options ??
+    MINIMAL_VIEWPORTS;
+
   const layout = useParameter<"centered" | "fullscreen" | undefined>("layout");
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [maxWidth, setMaxWidth] = useState(-1);
-  const [width, setWidth] = useState(-1);
-
   const isCentered = layout === "centered";
   const isDisabled = storyGlobals[KEY]?.width || isCentered;
   const isActive = globals[KEY]?.width && !isCentered;
 
-  const emit = useChannel({
-    [EVENTS.MAX_WIDTH_CHANGED]: setMaxWidth,
-  });
+  const [isOpen, setIsOpen] = useState(false);
+  const [maxWidth, setMaxWidth] = useState<number | undefined>(undefined);
+  const [width, setWidth] = useState<number | undefined>(
+    storyGlobals[KEY]?.width ?? globals[KEY]?.width ?? maxWidth,
+  );
 
-  const updateWidth = (value: number) => {
+  const emit = useChannel(
+    {
+      [EVENTS.MAX_WIDTH_CHANGED]: setMaxWidth,
+      [STORY_RENDERED]: () => {
+        setWidth(storyGlobals[KEY]?.width ?? globals[KEY]?.width ?? maxWidth);
+      },
+    },
+    [globals, storyGlobals],
+  );
+
+  const setAndSyncWidth = (value: number | undefined) => {
     setWidth(value);
-    emit(EVENTS.WIDTH_CHANGE, value);
+    syncToGlobal(value);
   };
 
-  // Globals is throttled, only update at end of a change for url sync
+  // Globals updates url which is throttled to 100 per 10 secs
+  // so must be conservative and only update when necessary
   const syncToGlobal = (value: number | undefined) => {
     updateGlobals({
       [KEY]: {
@@ -50,29 +68,24 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
     });
   };
 
-  const onViewportPresetChange = (viewport: string) => {
-    const v = MINIMAL_VIEWPORTS[viewport];
-    if (!v) return;
+  const onViewportPresetChange = (viewportWidth: number) => {
+    if (maxWidth && viewportWidth > maxWidth) viewportWidth = maxWidth;
 
-    let newWidth = Number(v.styles.width.slice(0, -2) ?? maxWidth);
-    if (newWidth > maxWidth) newWidth = maxWidth;
-
-    updateWidth(newWidth);
-    syncToGlobal(newWidth);
-  };
-
-  const onReset = () => {
-    updateWidth(maxWidth);
-    syncToGlobal(maxWidth);
+    setAndSyncWidth(viewportWidth);
   };
 
   useEffect(() => {
-    if (maxWidth !== -1 && width === -1) {
-      updateWidth(storyGlobals[KEY]?.width ?? globals[KEY]?.width ?? maxWidth);
-    } else if (!isActive) {
-      updateWidth(maxWidth);
-    }
-  }, [maxWidth, isActive, globals[KEY]?.width]);
+    emit(EVENTS.STORYBOOK_COLOR_NEGATIVE, theme.color.negative);
+  }, [theme]);
+
+  useEffect(() => {
+    emit(EVENTS.WIDTH_CHANGE, width);
+  }, [width]);
+
+  useEffect(() => {
+    if (width !== undefined) return;
+    setWidth(storyGlobals[KEY]?.width ?? globals[KEY]?.width ?? maxWidth);
+  }, [maxWidth]);
 
   return (
     <WithTooltip
@@ -84,28 +97,32 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
         <Tooltip>
           <Slider
             value={width}
-            minValue={10}
             maxValue={maxWidth}
+            minValue={10}
             label="Width"
             name="width"
             unit="px"
             onChange={(value) =>
-              updateWidth(typeof value === "number" ? value : (value[0] ?? 0))
+              setWidth(!Array.isArray(value) ? value : (value[0] ?? -1))
             }
             onChangeEnd={(value) =>
-              syncToGlobal(typeof value === "number" ? value : (value[0] ?? 0))
+              syncToGlobal(!Array.isArray(value) ? value : (value[0] ?? -1))
             }
-            onReset={onReset}
+            onReset={() => setAndSyncWidth(maxWidth)}
           />
 
-          {Object.keys(MINIMAL_VIEWPORTS).map((viewport) => (
+          {Object.keys(viewports).map((viewport) => (
             <Button
               key={viewport}
               style={{ width: "100%" }}
               variant="ghost"
-              onClick={() => onViewportPresetChange(viewport)}
+              onClick={() =>
+                onViewportPresetChange(
+                  Number(viewports[viewport]!.styles.width.replace("px", "")),
+                )
+              }
             >
-              {MINIMAL_VIEWPORTS[viewport]?.name ?? ""}
+              {viewports[viewport]?.name ?? ""}
             </Button>
           ))}
         </Tooltip>

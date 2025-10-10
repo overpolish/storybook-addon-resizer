@@ -7,8 +7,13 @@ const meta: Meta<typeof Header> = {
   parameters: {
     // More on Story layout: https://storybook.js.org/docs/react/configure/story-layout
     layout: "fullscreen",
+    viewport: {
+      options: [
+        { name: "Custom", styles: { width: "375px", height: "667px" } },
+      ],
+    },
   },
-  globals: { resizer: { width: 403 } },
+  globals: { resizer: { width: 303 } },
 };
 
 export default meta;
