@@ -45,7 +45,11 @@ export const Tool = memo(function Tool({ api }: { api: API }) {
 
   const emit = useChannel(
     {
-      [EVENTS.MAX_WIDTH_CHANGED]: setMaxWidth,
+      [EVENTS.MAX_WIDTH_CHANGED]: (value: number) => {
+        setMaxWidth(value);
+
+        if (!isActive) setWidth(value);
+      },
       [STORY_RENDERED]: () => {
         setWidth(storyGlobals[KEY]?.width ?? globals[KEY]?.width ?? maxWidth);
       },

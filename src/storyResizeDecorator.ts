@@ -1,6 +1,7 @@
 import {
   useChannel,
   useEffect,
+  useGlobals,
   useParameter,
 } from "storybook/internal/preview-api";
 import { css } from "storybook/internal/theming";
@@ -9,7 +10,7 @@ import type {
   StoryContext,
   PartialStoryFn as StoryFunction,
 } from "storybook/internal/types";
-import { EVENTS } from "./constants";
+import { EVENTS, KEY } from "./constants";
 
 const RESIZER_STYLE_ID = "resizer-visualizer";
 const RESIZER_WIDTH_VAR = "--resizer-width";
@@ -75,11 +76,29 @@ export const storyResizeDecorator = (
   StoryFn: StoryFunction<Renderer>,
   context: StoryContext<Renderer>,
 ) => {
+  const [globals] = useGlobals();
+
   const layout = useParameter<"centered" | "fullscreen" | undefined>("layout");
   const isCentered = layout === "centered";
   const isInDocs = context.viewMode === "docs";
 
+  const updateWidth = (width: number) => {
+    document.body.style.setProperty(
+      RESIZER_WIDTH_VAR,
+      width ? `${width}px` : "",
+    );
+    document.body.setAttribute(RESIZER_WIDTH_ATTR, width.toString());
+    document.body.style.setProperty(
+      RESIZER_OVERFLOW_VISUAL_VISIBILITY_VAR,
+      width === document.documentElement.clientWidth ? "hidden" : "visible",
+    );
+  };
+
   const sendMaxWidth = () => {
+    if (globals[KEY].width === undefined) {
+      updateWidth(document.documentElement.clientWidth);
+    }
+
     emit(EVENTS.MAX_WIDTH_CHANGED, document.documentElement.clientWidth);
   };
 
@@ -87,18 +106,7 @@ export const storyResizeDecorator = (
     [EVENTS.STORYBOOK_COLOR_NEGATIVE]: (color) => {
       document.body.style.setProperty(RESIZER_COLOR_VAR, color);
     },
-    [EVENTS.WIDTH_CHANGE]: (width: number) => {
-      console.log(width);
-      document.body.style.setProperty(
-        RESIZER_WIDTH_VAR,
-        width ? `${width}px` : "",
-      );
-      document.body.setAttribute(RESIZER_WIDTH_ATTR, width.toString());
-      document.body.style.setProperty(
-        RESIZER_OVERFLOW_VISUAL_VISIBILITY_VAR,
-        width === document.documentElement.clientWidth ? "hidden" : "visible",
-      );
-    },
+    [EVENTS.WIDTH_CHANGE]: updateWidth,
   });
 
   useEffect(() => {
