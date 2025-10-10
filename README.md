@@ -8,16 +8,17 @@
 
 The viewport is static and it cuts off overflow. With the **Resizer** addon you get the power of viewports _AND_ a slider to easily update the container width.
 
-<!-- DEMO VIDEO HERE -->
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/7b8d8661-f97f-48b0-91ab-f6a1dfba9c88" alt="resizer-addon-preview" width="600">
+</div>
+
+&nbsp;
 
 ```sh
 npm install -D storybook-addon-resizer
 ```
 
 ## Usage
-
-> [!IMPORTANT]
-> Resizer does _not_ work in `centered` layouts or docs.
 
 It just works out the box ⚡️
 
@@ -51,6 +52,9 @@ export const Large: Story = {
 ```
 
 Values are provided in `px`.
+
+> [!IMPORTANT]
+> Resizer does _not_ work in `centered` layouts or docs.
 
 <!-- Links -->
 
