@@ -1,6 +1,9 @@
-<div align="center">
+<h1 align="center">
+  <img src="icon.png" alt="Storybook Addon Resizer Icon" height="34" style="vertical-align: sub;" />
+  Storybook Addon Resizer
+</h1>
 
-# Storybook Addon Resizer
+<div align="center">
 
 [![Storybook][storybook-shield]][storybook-url]
 
@@ -19,6 +22,9 @@ npm install -D storybook-addon-resizer
 ```
 
 ## Usage
+
+> [!IMPORTANT]
+> Resizer does _not_ work in `centered` layouts or docs.
 
 It just works out the box ⚡️
 
@@ -52,9 +58,6 @@ export const Large: Story = {
 ```
 
 Values are provided in `px`.
-
-> [!IMPORTANT]
-> Resizer does _not_ work in `centered` layouts or docs.
 
 <!-- Links -->
 
