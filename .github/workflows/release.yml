@@ -2,6 +2,10 @@ name: Release
 
 on: [push]
 
+permissions:
+  contents: write
+  issues: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
