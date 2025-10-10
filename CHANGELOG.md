@@ -1,3 +1,15 @@
+# v1.0.2 (Fri Oct 10 2025)
+
+#### ⚠️ Pushed to `main`
+
+- Update storybook peer dependency version constraint ([@domingasp](https://github.com/domingasp))
+
+#### Authors: 1
+
+- Domingas P ([@domingasp](https://github.com/domingasp))
+
+---
+
 # v1.0.1 (Fri Oct 10 2025)
 
 #### 🐛 Bug Fix
