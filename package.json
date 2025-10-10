@@ -1,6 +1,6 @@
 {
   "name": "storybook-addon-resizer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Resize the story container",
   "keywords": [
     "resize",
@@ -10,11 +10,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/domingasp/storybook-addon-resizer.git"
+    "url": "https://github.com/overpolish/storybook-addon-resizer.git"
   },
   "type": "module",
   "license": "MIT",
-  "author": "Domingas Pleckauskas <hello@madebydom.dev>",
+  "author": "Dom <dom@overpolish.co>",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -99,6 +99,6 @@
     "supportedFrameworks": [
       "react"
     ],
-    "icon": "https://raw.githubusercontent.com/domingasp/storybook-addon-resizer/HEAD/icon.png"
+    "icon": "https://raw.githubusercontent.com/overpolish/storybook-addon-resizer/HEAD/icon.png"
   }
 }

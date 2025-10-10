@@ -2,11 +2,11 @@
 
 #### ⚠️ Pushed to `main`
 
-- Update storybook peer dependency version constraint ([@domingasp](https://github.com/domingasp))
+- Update storybook peer dependency version constraint ([@overpolish](https://github.com/overpolish))
 
 #### Authors: 1
 
-- Domingas P ([@domingasp](https://github.com/domingasp))
+- Dom ([@overpolish](https://github.com/overpolish))
 
 ---
 
@@ -14,12 +14,12 @@
 
 #### 🐛 Bug Fix
 
-- Resizer Addon [#1](https://github.com/domingasp/storybook-addon-resizer/pull/1) ([@domingasp](https://github.com/domingasp))
+- Resizer Addon [#1](https://github.com/overpolish/storybook-addon-resizer/pull/1) ([@overpolish](https://github.com/overpolish))
 
 #### ⚠️ Pushed to `main`
 
-- Initial commit ([@domingasp](https://github.com/domingasp))
+- Initial commit ([@overpolish](https://github.com/overpolish))
 
 #### Authors: 1
 
-- Domingas P ([@domingasp](https://github.com/domingasp))
+- Dom ([@overpolish](https://github.com/overpolish))
