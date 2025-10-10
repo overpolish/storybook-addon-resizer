@@ -10,6 +10,7 @@ const meta: Meta<typeof Button> = {
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   argTypes: {
     backgroundColor: { control: "color" },
+    someProp: { control: "range" },
   },
   args: {
     onClick: fn(),
@@ -37,12 +38,16 @@ export const Primary: Story = {
 };
 
 export const Secondary: Story = {
+  parameters: {
+    layout: "centered",
+  },
   args: {
     label: "Button",
   },
 };
 
 export const Large: Story = {
+  globals: { resizer: { width: 403 } },
   args: {
     size: "large",
     label: "Button",

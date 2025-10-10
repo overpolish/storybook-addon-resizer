@@ -11,6 +11,7 @@ const preview: Preview = {
   },
   initialGlobals: {
     background: { value: "light" },
+    resizer: { width: 100 },
   },
 };
 

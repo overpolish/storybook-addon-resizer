@@ -6,6 +6,7 @@ interface ButtonProps {
    * Is this the principal call to action on the page?
    */
   primary?: boolean;
+  someProp?: number;
   /**
    * What background color to use
    */
